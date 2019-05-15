@@ -3,5 +3,7 @@
             [clojure.java.io :as io]))
 
 (defn read-stream [in]
-  (-> (repeatedly #(edn/read {:eof ::eof} in))
-      (take-while #(not= % ::eof))))
+  (->> (-> (repeatedly #(edn/read {:eof ::eof} in))
+           (take-while #(not= % ::eof)))
+       (filter #(and (map? %)
+                     (contains? % :trace)))))
