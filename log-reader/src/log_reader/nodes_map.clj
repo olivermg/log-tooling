@@ -1,7 +1,4 @@
-(ns log-reader.storage.nested-memory
-  (:require [log-reader.nested-storage :as st]))
-
-(defonce ^:private +nodes-map+ (atom {}))
+(ns log-reader.nodes-map)
 
 (defn store-logline [nodes-map {:keys [trace] :as logline}]
   (let [[path nodes-map] (reduce (fn [[path nodes-map] {:keys [id] :as trace-step}]
@@ -10,11 +7,8 @@
                                       (update-in nodes-map path #(assoc % :callinfo (dissoc trace-step :id)))]))
                                  [[] nodes-map]
                                  trace)
-        #_path      #_(->> (map :id trace)
-                       (interleave (repeat :children))
-                       rest
-                       vec)]
-    (assoc-in nodes-map (conj path :message) (dissoc logline :trace))))
+        message-path (-> path butlast vec (conj :message))]
+    (assoc-in nodes-map message-path (dissoc logline :trace))))
 
 #_(defn lookup [nodes-map trace-ids]
   (let [path (-> (interleave (repeat :children) trace-ids)
@@ -23,6 +17,12 @@
             (update :children #(map (fn [[k v]]
                                       (conj (vec trace-ids) k))
                                     %)))))
+
+(defn store-loglines [nodes-map loglines]
+  (reduce (fn [nodes-map line]
+            (store-logline nodes-map line))
+          nodes-map
+          loglines))
 
 (defn sorted-data [nodes-map]
   (->> (vals nodes-map)
