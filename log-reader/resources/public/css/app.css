@@ -1,3 +1,7 @@
 body {
-    background-color: #ffaaaa;
+    #background-color: #ffaaaa;
+}
+
+.call {
+    margin-left: 20px;
 }

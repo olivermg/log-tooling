@@ -2,17 +2,25 @@
   (:gen-class)
   (:require [log-reader.reader :as r]
             [log-reader.nodes-map :as nm]
-            [log-reader.output :as o]))
+            [log-reader.output :as o]
+            [log-reader.webserver :as w]))
 
 (defn -main [& args]
   (->> (r/read-stream *in*)
        (nm/store-loglines {})
        (o/format)
-       print))
+       (w/serve)))
 
 
 
-#_(let [in-str (str "{:trace [{:id :a :fn :afn :args :aargs :time 2}] :x :xxx}"
-                  "{:trace [{:id :a :fn :afn :args :aargs :time 2} {:id :aa :fn :aafn :args :aaargs :time 3}] :y :yyy}")]
+#_(let [in-str (str "{:trace [{:id :a :fn :afn :args :aargs :time 2}] :x :a}"
+                  "{:trace [{:id :a :fn :afn :args :aargs :time 2} {:id :aa :fn :aafn :args :aaargs :time 3}] :x :aa}"
+                  "{:trace [{:id :b :fn :bfn :args :bargs :time 1} {:id :ba :fn :bafn :args :baargs :time 2}] :x :ba}"
+                  "{:trace [{:id :b :fn :bfn :args :bargs :time 3} {:id :bb :fn :bbfn :args :bbargs :time 4}] :x :bb}"
+                  "{:trace [{:id :a :fn :afn :args :aargs :time 4} {:id :ab :fn :abfn :args :abargs :time 5}] :x :ab}"
+                  "{:trace [{:id :a :fn :afn :args :aargs :time 4} {:id :ab :fn :abfn :args :abargs :time 5} {:id :aba :fn :abafn :args :abaargs :time 6}] :x :aba}"
+                  "{:trace [{:id :a :fn :afn :args :aargs :time 4} {:id :ab :fn :abfn :args :abargs :time 5} {:id :abb :fn :abbfn :args :abbargs :time 7}] :x :abb}")]
   (with-in-str in-str
-    (-main)))
+    (let [srv (-main)]
+      (Thread/sleep 10000)
+      (srv))))

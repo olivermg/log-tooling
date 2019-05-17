@@ -4,15 +4,15 @@
             [zprint.core :as zp]))
 
 (defn- ->hiccup [{:keys [callinfo children message] :as node}]
-  [:div.node
+  [:div.call
    (let [{:keys [args fn time]} callinfo]
-     [:div.callinfo
-      [:div.fn [:pre (zp/zprint-str fn)]]
-      [:div.args [:pre (zp/zprint-str args)]]
-      [:div.time [:pre (zp/zprint-str time)]]])
+     [:span.info
+      [:span.fn   (zp/zprint-str fn)]
+      [:span.args (zp/zprint-str args)]
+      [:span.time (zp/zprint-str time)]])
    (when message
-     [:div.message
-      [:pre (zp/zprint-str message)]])
+     [:span.message
+      (zp/zprint-str message)])
    (into [:div.children]
          children)])
 
