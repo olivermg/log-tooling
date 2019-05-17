@@ -4,8 +4,13 @@
             [log-reader.nodes-map :as nm]
             [log-reader.output :as o]))
 
+(defn- read-sexp [in]
+  (try
+    (edn/read {:eof ::eof} in)
+    (catch Throwable e)))
+
 (defn read-stream [in]
-  (->> (repeatedly #(edn/read {:eof ::eof} in))
+  (->> (repeatedly #(read-sexp in))
        (take-while #(not= % ::eof))
        (filter #(and (map? %)
                      (contains? % :trace)))))
