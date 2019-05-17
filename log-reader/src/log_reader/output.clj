@@ -1,7 +1,6 @@
 (ns log-reader.output
   (:refer-clojure :rename {format format-clj})
   (:require [log-reader.nodes-map :as nm]
-            [hiccup.core :as h]
             [zprint.core :as zp]))
 
 (defn- ->hiccup [{:keys [callinfo children message] :as node}]
