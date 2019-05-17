@@ -7,9 +7,11 @@
   [:div.call
    (let [{:keys [args fn time]} callinfo]
      [:span.info
+      [:span.time (zp/zprint-str time)]
       [:span.fn   (zp/zprint-str fn)]
-      [:span.args (zp/zprint-str args)]
-      [:span.time (zp/zprint-str time)]])
+      [:span.args.collapsable.collapsed
+       [:span.shown (zp/zprint-str args)]
+       [:span.hidden "(args...)"]]])
    (when message
      [:span.message
       (zp/zprint-str message)])
@@ -17,7 +19,6 @@
          children)])
 
 (defn format [nodes-map]
-  (let [nodes       (nm/sorted-data nodes-map)
-        hiccup-data (into [:div.log-output]
-                          (nm/traverse-all ->hiccup nodes))]
-    (h/html hiccup-data)))
+  (let [nodes (nm/sorted-data nodes-map)]
+    (into [:div.log-output]
+          (nm/traverse-all ->hiccup nodes))))

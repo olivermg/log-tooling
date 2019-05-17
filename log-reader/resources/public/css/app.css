@@ -1,7 +1,38 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
 body {
-    #background-color: #ffaaaa;
+    font-family: monospace;
+    font-size: 0.8em;
+}
+
+.collapsed > .shown {
+    display: none;
+}
+.collapsed > .hidden {
+    display: initial;
+}
+.shown {
+    display: initial;
+}
+.hidden {
+    display: none;
 }
 
 .call {
     margin-left: 20px;
+}
+
+.call:nth-child(odd) {
+    #background-color: #ffffff;
+}
+.call:nth-child(even) {
+    #background-color: #cccccc;
+}
+
+.call > * {
+    margin-left: 3px;
+    margin-right: 3px;
 }
