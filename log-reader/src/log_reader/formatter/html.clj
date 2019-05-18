@@ -1,6 +1,7 @@
-(ns log-reader.output
+(ns log-reader.formatter.html
   (:refer-clojure :rename {format format-clj})
-  (:require [log-reader.nodes-map :as nm]
+  (:require [log-reader.formatter :as f]
+            [log-reader.nodes-map :as nm]
             [zprint.core :as zp]))
 
 (defn- ->hiccup [{:keys [callinfo children message] :as node}]
@@ -18,7 +19,14 @@
    (into [:div.children]
          children)])
 
-(defn format [nodes-map]
-  (let [nodes (nm/sorted-data nodes-map)]
-    (into [:div.log-output]
-          (nm/traverse-all ->hiccup nodes))))
+(defrecord HtmlFormatter []
+
+  f/Formatter
+
+  (format [this nodes-map]
+    (let [nodes (nm/sorted-data nodes-map)]
+      (into [:div.log-output]
+            (nm/traverse-all ->hiccup nodes)))))
+
+(defn construct []
+  (map->HtmlFormatter {}))

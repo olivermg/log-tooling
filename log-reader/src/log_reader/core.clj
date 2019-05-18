@@ -2,14 +2,16 @@
   (:gen-class)
   (:require [log-reader.reader :as r]
             [log-reader.nodes-map :as nm]
-            [log-reader.output :as o]
+            [log-reader.formatter :as f]
+            [log-reader.formatter.html :as fh]
             [log-reader.webserver :as w]))
 
 (defn -main [& args]
-  (->> (r/read-stream *in*)
-       (nm/store-loglines {})
-       (o/format)
-       (w/serve)))
+  (let [formatter (fh/construct)]
+    (->> (r/read-stream *in*)
+         (nm/store-loglines {})
+         (f/format formatter)
+         (w/serve))))
 
 
 
@@ -19,7 +21,7 @@
                   "{:trace [{:id :a :fn :afn :args :aargs :time 4} {:id :ab :fn :abfn :args :abargs :time 5}] :x :ab}"
                   "{:trace [{:id :a :fn :afn :args :aargs :time 4} {:id :ab :fn :abfn :args :abargs :time 5} {:id :aba :fn :abafn :args :abaargs :time 6}] :x :aba}"
                   "{:trace [{:id :a :fn :afn :args :aargs :time 4} {:id :ab :fn :abfn :args :abargs :time 5} {:id :abb :fn :abbfn :args :abbargs :time 7}] :x :abb}")
-      in-str (slurp "testlog4.log")]
+      in-str (slurp "testlog.log")]
   (with-in-str in-str
     (let [srv (-main)]
       (Thread/sleep 10000)
