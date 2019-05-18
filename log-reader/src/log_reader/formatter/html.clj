@@ -5,19 +5,24 @@
             [zprint.core :as zp]))
 
 (defn- ->hiccup [{:keys [callinfo children message] :as node}]
-  [:div.call
-   (let [{:keys [args fn time]} callinfo]
-     [:span.info
-      [:span.time (zp/zprint-str time)]
-      [:span.fn   (zp/zprint-str fn)]
-      [:span.args.collapsable.collapsed
-       [:span.shown (zp/zprint-str args)]
-       [:span.hidden "(args...)"]]])
-   (when message
-     [:span.message
-      (zp/zprint-str message)])
-   (into [:div.children]
-         children)])
+  (let [{:keys [args fn time]} callinfo]
+    [:div.call
+     [:span.fn   (zp/zprint-str fn)]
+     (when message
+       (let [{:keys [name ns time msg data]} message]
+         [:span.message
+          [:span.message-name (str name)]
+          [:span.message-ns (str ns)]
+          [:span.message-time (zp/zprint-str time)]
+          [:span.message-msg (str msg)]
+          [:span.message-data (zp/zprint-str data)]]))
+     [:span.time (zp/zprint-str time)]
+     [:span.args.collapsable.collapsed
+      [:span.shown (zp/zprint-str args)]
+      [:span.hidden "(args...)"]]
+     (when children
+       (into [:div.children]
+             children))]))
 
 (defrecord HtmlFormatter []
 
