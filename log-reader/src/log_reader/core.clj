@@ -1,17 +1,47 @@
 (ns log-reader.core
   (:gen-class)
-  (:require [log-reader.reader :as r]
+  (:require [clojure.edn :as edn]
+            [clojure.pprint :as pp]
+            [log-reader.reader :as r]
             [log-reader.nodes-map :as nm]
             [log-reader.formatter :as f]
             [log-reader.formatter.html :as fh]
+            [log-reader.formatter.text :as ft]
+            [log-reader.printer :as p]
+            [log-reader.printer.http :as ph]
+            [log-reader.printer.stdout :as ps]
             [log-reader.webserver :as w]))
 
+(defn- getopts [args]
+  (->> args
+       (partition 2)
+       (map (fn [[[_ & ks] v]]
+              [(->> ks (apply str) keyword) v]))
+       (into {})))
+
+(defn- parse-edn [edn]
+  (cond
+    (map? edn)    (->> edn
+                       (map (fn [[k v]]
+                              [k (parse-edn v)]))
+                       (into {}))
+    (string? edn) (try
+                    (edn/read-string edn)
+                    (catch Exception e
+                      edn))
+    true          edn))
+
 (defn -main [& args]
-  (let [formatter (fh/construct)]
-    (->> (r/read-stream *in*)
-         (nm/store-loglines {})
-         (f/format formatter)
-         (w/serve))))
+  (let [{:keys [format] :as opts} (getopts args)
+        [formatter printer] (case (keyword format)
+                              :html [(fh/construct) (ph/construct 8888)]
+                              [(ft/construct) (ps/construct)])
+        xf        (comp (filter #(and (map? %) (contains? % :trace) (contains? % :name)))
+                        (map #(update % :data parse-edn))
+                        (f/format-lines-xf formatter))
+        input     (r/read-stream *in*)
+        output    (into [] xf input)]
+    (p/print-lines printer output)))
 
 
 
