@@ -1,8 +1,7 @@
 (ns log-reader.formatter.text
   (:require [clojure.edn :as edn]
             [clojure.string :as s]
-            [log-reader.formatter :as f]
-            [log-reader.nodes-map :as nm]))
+            [log-reader.formatter :as f]))
 
 (defn- format-trace [{:keys [args fn id time] :as trace}]
   (mod id 10000))

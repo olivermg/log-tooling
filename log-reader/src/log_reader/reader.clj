@@ -1,7 +1,6 @@
 (ns log-reader.reader
   (:require [clojure.edn :as edn]
-            [clojure.java.io :as io]
-            [log-reader.nodes-map :as nm]))
+            [clojure.java.io :as io]))
 
 (defn- read-sexp [in]
   (try
@@ -10,6 +9,4 @@
 
 (defn read-stream [in]
   (->> (repeatedly #(read-sexp in))
-       (take-while #(not= % ::eof))
-       #_(filter #(and (map? %)
-                     (contains? % :trace)))))
+       (take-while #(not= % ::eof))))
