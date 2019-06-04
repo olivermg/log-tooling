@@ -1,10 +1,9 @@
 (ns log-reader.formatter.html
-  (:refer-clojure :rename {format format-clj})
   (:require [log-reader.formatter :as f]
             [log-reader.nodes-map :as nm]
             [zprint.core :as zp]))
 
-(defn- ->hiccup [{:keys [callinfo children message] :as node}]
+#_(defn- ->hiccup [{:keys [callinfo children message] :as node}]
   (let [{:keys [args fn time]} callinfo]
     [:div.call
      [:span.fn   (zp/zprint-str fn)]
@@ -24,14 +23,27 @@
        (into [:div.children]
              children))]))
 
+(defn- format-trace [{:keys [args fn id time] :as trace}]
+  [:span.trace
+   [:span.id id]
+   [:span.time time]
+   [:span.fn fn]
+   [:span.args args]])
+
+(defn- format-traces [traces]
+  (map format-trace traces))
+
 (defrecord HtmlFormatter []
 
   f/Formatter
 
-  (format [this nodes-map]
-    (let [nodes (nm/sorted-data nodes-map)]
-      (into [:div.log-output]
-            (nm/traverse-all ->hiccup nodes)))))
+  (format-line [this {:keys [data msg name ns time trace] :as line}]
+    [:div.line
+     [:span.time time]
+     (into [:span.traces] (format-traces trace))
+     [:span.name name]
+     [:span.msg msg]
+     [:span.data data]]))
 
 (defn construct []
   (map->HtmlFormatter {}))

@@ -1,5 +1,7 @@
-(ns log-reader.formatter
-  (:refer-clojure :rename {format format-clj}))
+(ns log-reader.formatter)
 
 (defprotocol Formatter
-  (format [this nodes-map]))
+  (format-line [this line]))
+
+(defn format-lines-xf [this]
+  (map (partial format-line this)))
