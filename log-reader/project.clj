@@ -7,6 +7,14 @@
                  [http-kit "2.3.0"]
                  [hiccup "1.0.5"]
                  [zprint "0.4.15"]]
+  :plugins [[io.taylorwood/lein-native-image "0.3.0"]]
   :main ^:skip-aot log-reader.core
   :target-path "target/%s"
+  :native-image {;;;graal-bin ""  ;; set this via env var GRAALVM_HOME if not in PATH already
+                 :name     "logreader"
+                 :jvm-opts ["-Dclojure.compiler.direct-linking=true"]
+                 :opts     ["--initialize-at-build-time"
+                            "--no-fallback"
+                            "--static"
+                            "--verbose"]}
   :profiles {:uberjar {:aot :all}})
