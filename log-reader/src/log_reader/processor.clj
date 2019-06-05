@@ -9,7 +9,7 @@
                        (into {}))
     (string? edn) (try
                     (edn/read-string edn)
-                    (catch Exception e
+                    (catch Throwable e
                       edn))
     true          edn))
 
