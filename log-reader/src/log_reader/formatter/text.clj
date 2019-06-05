@@ -16,15 +16,17 @@
 
   f/Formatter
 
-  (format-line [this {:keys [data level msg name ns time trace] :as line}]
+  (format-line [this {:keys [column data file fn level line msg name ns time trace] :as line}]
     (let [utctime (or (and time (t/format :iso-instant
                                           (t/instant time)))
-                      "n/a")
-          level   (or (some-> level edn/read-string clojure.core/name s/upper-case)
-                      "n/a")
-          name    (or name
-                      "n/a")
-          base    (format "[%s] %-5s (%s) %s" utctime level (format-traces trace) name)]
+                      "???")
+          level   (or (some-> level clojure.core/name s/upper-case) "???")
+          name    (or name "???")
+          file    (or file "???")
+          fn      (or fn "???")
+          line    (or line -1)
+          base    (format "[%s] %-5s (%s) <%s:%s:%d> %s"
+                          utctime level (format-traces trace) file fn line name)]
       (->> [base msg data]
            (remove nil?)
            (s/join ", ")))))
