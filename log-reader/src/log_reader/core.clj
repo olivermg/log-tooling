@@ -28,11 +28,11 @@
 (defn -main [& args]
   (let [opts                        (getopts args)
         {:keys [formatter printer]} (select-impls opts)
-        xf        (comp (proc/processor-xf)
-                        (f/format-lines-xf formatter))
-        input     (r/read-stream *in*)
-        output    (into [] xf input)]
-    (p/print-lines printer output)))
+        xf                          (comp (r/eof-xf)
+                                          (proc/processor-xf)
+                                          (f/format-lines-xf formatter)
+                                          (p/print-line-xf printer))]
+    (transduce xf (constantly nil) (r/read-stream *in*))))
 
 
 

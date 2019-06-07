@@ -48,11 +48,19 @@
 
   p/Printer
 
-  (print-lines [this lines]
-    (let [content (into [:div] lines)]
-      (println "Serving on port" port)
-      (hs/run-server (make-handler content)
-                     {:port port}))))
+  (print-line-xf [this]
+    (fn [rf]
+      (let [content (volatile! [:div])]
+        (fn
+          ([] (rf))
+          ([result]
+           (println (str "Serving HTTP on port ") port ", press Ctrl-C to quit.")
+           (hs/run-server (make-handler @content)
+                          {:port port})
+           (rf result))
+          ([result input]
+           (vswap! content conj input)
+           (rf result input)))))))
 
 (defn construct [port]
   (map->HttpPrinter {:port port}))
