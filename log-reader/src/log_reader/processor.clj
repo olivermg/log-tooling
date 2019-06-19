@@ -15,8 +15,8 @@
 
 (defn- is-logexpr? [expr]
   (and (map? expr)
-       (contains? expr :trace)
-       (contains? expr :name)))
+       (contains? expr :checkpoints)
+       (contains? expr :level)))
 
 (defn- refine [expr]
   (update expr :data parse-edn))

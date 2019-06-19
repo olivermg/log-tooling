@@ -5,29 +5,30 @@
             [tick.alpha.api :as t]
             [zprint.core :as zp]))
 
-(defn- format-trace [{:keys [args fn id time] :as trace}]
-  (mod id 10000))
+(defn- format-checkpoint [{:keys [args file fn id line name ns time] :as checkpoint}]
+  (str name ":" (mod id 1000)))
 
-(defn- format-traces [traces]
-  (->> (map format-trace traces)
+(defn- format-checkpoints [checkpoints]
+  (->> (butlast checkpoints)
+       (map format-checkpoint)
        (s/join " ")))
 
 (defrecord TextFormatter []
 
   f/Formatter
 
-  (format-line [this {:keys [column data file fn level line msg name ns time trace] :as line}]
-    (let [utctime (or (and time (t/format :iso-instant
-                                          (t/instant time)))
-                      "???")
-          level   (or (some-> level clojure.core/name s/upper-case) "???")
-          name    (or name "???")
-          file    (or file "???")
-          fn      (or fn "???")
-          line    (or line -1)
-          base    (format "[%s] %-5s (%s) <%s:%s:%d> %s"
-                          utctime level (format-traces trace) file fn line name)]
-      (->> [base msg data]
+  (format-line [this {:keys [checkpoints data level msg] :as line}]
+    (let [{:keys [file fn id line name ns time]} (-> checkpoints last)
+          utctime  (or (and time
+                            (t/format :iso-instant (t/instant time)))
+                       "?")
+          level    (or (some-> level clojure.core/name s/upper-case) "?")
+          file     (or file "?")
+          fn       (or fn "?")
+          line     (or line -1)
+          metainfo (format "[%s] %-5s (%s) <%s:%s:%d>"
+                           utctime level (format-checkpoints checkpoints) file fn line)]
+      (->> [metainfo msg data]
            (remove nil?)
            (s/join ", ")))))
 
