@@ -26,7 +26,7 @@
           file     (or file "?")
           fn       (or fn "?")
           line     (or line -1)
-          metainfo (format "[%s] %-5s (%s) <%s:%s:%d>"
+          metainfo (format "[%s] %-5s (%s) <%s:%s:%s>"
                            utctime level (format-checkpoints checkpoints) file fn line)]
       (->> [metainfo msg data]
            (remove nil?)
