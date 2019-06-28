@@ -75,13 +75,13 @@
     (format "%s%s%s%s" FG_GREEN BOLD msg RESET)))
 
 (defn- format-data [data]
-  (let [pretty-data #_(with-out-str (pp/pprint data)) (zp/czprint-str data)]
-    (when data
+  (when (and data (not-empty data))
+    (let [pretty-data #_(with-out-str (pp/pprint data)) (zp/czprint-str data)]
       (format "%s%s%s" BOLD pretty-data RESET))))
 
 (defn- format-line [{:keys [checkpoints data level msg] :as line}]
-  (let [{:keys [file fn id line name ns time]} (some-> checkpoints last)
-        checkpoints                            (some-> checkpoints butlast format-checkpoints)
+  (let [{:keys [file fn id line name ns time]} (-> checkpoints last)
+        checkpoints                            (-> checkpoints butlast format-checkpoints)
         utctime                                (or (and time
                                                         (t/format :iso-instant (t/instant time)))
                                                    "?")
