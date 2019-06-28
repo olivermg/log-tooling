@@ -10,6 +10,7 @@ pom.xml.asc
 /.nrepl-port
 .hgignore
 .hg/
+/resources/META-INF/native-image
 
 *.swp
 *~
