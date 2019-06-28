@@ -8,7 +8,5 @@
     (catch Throwable e)))
 
 (defn read-stream [in]
-  (repeatedly #(read-sexp in)))
-
-(defn eof-xf []
-  (take-while #(not= % ::eof)))
+  (->> (repeatedly #(read-sexp in))
+       (take-while #(not= % ::eof))))

@@ -2,6 +2,7 @@
   (:gen-class)
   (:require [clojure.edn :as edn]
             [clojure.pprint :as pp]
+            #_[clojure.spec.gen.alpha :as csga]
             [log-reader.formatter :as f]
             [log-reader.formatter.html :as fh]
             [log-reader.formatter.text :as ft]
@@ -28,11 +29,12 @@
 (defn -main [& args]
   (let [opts                        (getopts args)
         {:keys [formatter printer]} (select-impls opts)
-        xf                          (comp (r/eof-xf)
-                                          (proc/processor-xf)
+        xf                          (comp (proc/processor-xf)
                                           (f/format-lines-xf formatter)
                                           (p/print-line-xf printer))]
-    (transduce xf (constantly nil) (r/read-stream *in*))))
+    (transduce xf (constantly nil) (r/read-stream *in*))
+    (System/exit 0)  ;; otherwise it'll wait for something (we still have to find out why)
+    ))
 
 
 
