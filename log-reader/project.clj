@@ -5,7 +5,7 @@
             :url "https://www.eclipse.org/legal/epl-2.0/"}
   :dependencies [[http-kit "2.3.0"]
                  [hiccup "1.0.5"]
-                 [org.clojure/clojure "1.10.0"]
+                 [org.clojure/clojure "1.9.0"]  ;; as 1.10 does not work currently with native-image + clojure.pprint/zprint.core
                  [tick "0.4.14-alpha"]
                  [zprint "0.4.15"]
 
@@ -17,9 +17,19 @@
   :native-image {;;;graal-bin ""  ;; set this via env var GRAALVM_HOME if not in PATH already
                  :name     "logreader"
                  :jvm-opts ["-Dclojure.compiler.direct-linking=true"]
-                 :opts     ["--initialize-at-build-time"
+                 :opts     ["--enable-http"
+                            "--initialize-at-build-time"
                             "--no-fallback"
-                            "--static"
-                            "--verbose"]}
+                            "--no-server"
+                            #_"--static"  ;; as this doesn't seem to work with clojure 1.9
+                            "--verbose"
+                            "--report-unsupported-elements-at-runtime"
+                            #_"-H:ConfigurationFileDirectories=resources/META-INF/native-image"
+                            "-H:+ReportExceptionStackTraces"
+                            #_"-H:+AllowVMInspection"
+                            #_"--allow-incomplete-classpath"
+                            #_"--initialize-at-run-time=clojure.spec.gen,clojure.spec.gen.alpha$dynaload"
+                            #_"--initialize-at-build-time=clojure.spec.gen.alpha$fn__2632,clojure.spec.gen.alpha$fn__2835$bytes__2838,clojure.spec.gen.alpha$fn__2835$fn__2836,clojure.spec.gen.alpha$fn__2976,clojure.spec.gen.alpha$lazy_combinator,clojure.spec.gen.alpha$fn__2976,clojure.spec.gen.alpha$fn__2635,clojure.spec.gen.alpha$fn__2919$simple_type_printable__2922"
+                            #_"--delay-class-initialization-to-runtime=clojure.spec.gen"]}
   :profiles {:uberjar {:aot :all}}
   :pedantic? :abort)
