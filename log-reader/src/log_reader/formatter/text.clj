@@ -71,13 +71,15 @@
           FG_CYAN line RESET))
 
 (defn- format-message [msg]
-  (when msg
-    (format "%s%s%s%s" FG_GREEN BOLD msg RESET)))
+  (if msg
+    (format "%s%s%s%s" FG_GREEN BOLD msg RESET)
+    ""))
 
 (defn- format-data [data]
-  (when (and data (not-empty data))
+  (if (and data (not-empty data))
     (let [pretty-data #_(with-out-str (pp/pprint data)) (zp/czprint-str data)]
-      (format "%s%s%s" BOLD pretty-data RESET))))
+      (format "%s%s%s" BOLD pretty-data RESET))
+    ""))
 
 (defn- format-line [{:keys [checkpoints data level msg] :as line}]
   (let [{:keys [file fn id line name ns time]} (-> checkpoints last)
