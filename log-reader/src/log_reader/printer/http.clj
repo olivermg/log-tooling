@@ -44,23 +44,27 @@
         "/app.css" app-css-response
         {:status 404}))))
 
-(defrecord HttpPrinter [port]
+(defrecord HttpPrinter [port content]
 
   p/Printer
 
-  (print-line-xf [this]
-    (fn [rf]
-      (let [content (volatile! [:div])]
-        (fn
-          ([] (rf))
-          ([result]
-           (println (str "Serving HTTP on port ") port ", press Ctrl-C to quit.")
-           (hs/run-server (make-handler @content)
-                          {:port port})
-           (rf result))
-          ([result input]
-           (vswap! content conj input)
-           (rf result input)))))))
+  (print-line [this line]
+    (hs/run-server (make-handler @content)  ;; TODO: need to update content dynamically
+                   {:port port})
+    (swap! content conj line)
+    #_(fn [rf]
+        (let [content (volatile! [:div])]
+          (fn
+            ([] (rf))
+            ([result]
+             (println (str "Serving HTTP on port ") port ", press Ctrl-C to quit.")
+             (hs/run-server (make-handler @content)
+                            {:port port})
+             (rf result))
+            ([result input]
+             (vswap! content conj input)
+             (rf result input)))))))
 
 (defn construct [port]
-  (map->HttpPrinter {:port port}))
+  (map->HttpPrinter {:port    port
+                     :content (atom [:div])}))

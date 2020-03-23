@@ -5,8 +5,8 @@
 
   p/Printer
 
-  (print-line-xf [this]
-    (map #(do (println %) %))))
+  (print-line [this line]
+    (println line)))
 
 (defn construct []
   (map->StdoutPrinter {}))

@@ -13,7 +13,7 @@
                       edn))
     true          edn))
 
-(defn- is-logexpr? [expr]
+(defn is-logexpr? [expr]
   (and (map? expr)
        (contains? expr :checkpoints)
        (contains? expr :level)))
@@ -21,6 +21,7 @@
 (defn- refine [expr]
   (update expr :data parse-edn))
 
-(defn processor-xf []
-  (comp (filter is-logexpr?)
-        (map refine)))
+(defn process [expr]
+  (if (is-logexpr? expr)
+    (refine expr)
+    expr))
