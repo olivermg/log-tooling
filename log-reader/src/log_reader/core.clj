@@ -2,6 +2,7 @@
   (:gen-class)
   (:require [clojure.edn :as edn]
             [clojure.pprint :as pp]
+            [clojure.java.io :as io]
             #_[clojure.string :as str]
             #_[clojure.spec.gen.alpha :as csga]
             [log-reader.formatter :as f]
@@ -30,7 +31,8 @@
 (defn -main [& args]
   (let [opts                        (getopts args)
         {:keys [formatter printer]} (select-impls opts)
-        xf                          (comp (map #(if (string? %)
+        xf                          (comp (r/read-stream-xf)
+                                          (map #(if (string? %)
                                                   %
                                                   (proc/process %)))
                                           (map #(if (proc/is-logexpr? %)
@@ -39,7 +41,7 @@
                                           (map #(p/print-line printer %)))]
     (transduce xf
                (constantly nil)
-               (r/read-stream *in*))
+               (-> *in* io/reader line-seq))
     (System/exit 0)  ;; otherwise it'll wait for something (we still have to find out why)
     ))
 
